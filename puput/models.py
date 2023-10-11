@@ -11,6 +11,7 @@ from wagtail.snippets.models import register_snippet
 from wagtail.search import index
 from taggit.models import TaggedItemBase, Tag as TaggitTag
 from modelcluster.fields import ParentalKey
+from wagtail.api import APIField
 
 from .abstracts import EntryAbstract, BlogAbstract
 from .utils import import_model
@@ -28,6 +29,13 @@ class BlogPage(BlogRoutes, Page, Blog):
     settings_panels = Page.settings_panels + getattr(Blog, "settings_panels", [])
 
     subpage_types = ["puput.EntryPage"]
+
+    api_fields = [
+        APIField('title'),
+        APIField('description'),
+        APIField('header_image'),
+        APIField('main_color')
+    ]
 
     def get_entries(self):
         return EntryPage.objects.descendant_of(self).live().order_by("-date").select_related("owner")
@@ -120,6 +128,19 @@ class EntryPageRelated(models.Model):
 
 class EntryPage(Entry, Page):
     # Search
+    api_fields = [
+        APIField('title'),
+        APIField('slug'),
+        APIField('body'),
+        APIField('markdown_body'),
+        APIField('tags'),
+        APIField('date'),
+        APIField('header_image'),
+        APIField('categories'),
+        APIField('excerpt'),
+        APIField('num_comments'),
+    ]
+
     search_fields = Page.search_fields + [
         index.SearchField("body"),
         index.SearchField("excerpt"),
